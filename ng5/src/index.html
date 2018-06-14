@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Dell Cubical Reservation</title>
+  <base href="/">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link href="assets/css/style.css" rel="stylesheet" type="text/css" media="all" />
+  <script src="assets/js/jquery-1.11.0.min.js"></script>
+  <script src="assets/js/jquery.seat-charts.js"></script>
+  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+</head>
+<!-- <body>
+  <app-root></app-root>
+</body> -->
+<body>
+  <div class="content">
+    <h1>Cubical Reservation</h1>
+    <div class="main">
+      <div class="demo">
+        <div style="margin: 10px 0px 10px 0px;">
+          <!-- Your Name: &nbsp; <input type="text" name="eName" class="custom-input" placeholder="Employee Name"> -->
+          Email: &nbsp; <input type="email" name="email" id="email" class="custom-input" placeholder="Dell ID">
+          EID: &nbsp; <input type="number" name="eid" id="eid" class="custom-input" placeholder="Employee ID" maxlength="7">
+          <input type="button" class="checkout-button green" id="checkoutBtn" value="Check Status">
+  
+        </div>
+        <div id="seat-map">
+          <div class="front"> &lt;&lt; LIFT THIS SIDE</div>						
+        </div>
+        <div class="booking-details">
+          <ul class="book-left">
+            <li>Office </li>
+            <li>Time </li>
+            <li>Seats </li>
+          </ul>
+          <ul class="book-right">
+            <li>: Dell 5</li>
+            <li>: June 11, 2018</li>
+            <li id="selected-seats" style="display: inline">None</li>	
+            
+          </ul>
+  
+          <div class="clear"></div>
+          <div>
+          <input type="button" value="Book Now" id="bookBtn" class="checkout-button">	
+          
+          </div>
+              
+          
+          <div id="legend"></div>
+        </div>
+        <div style="clear:both"></div>
+        </div>
+  
+        <script type="text/javascript">
+          var price = 10; //price
+          var str='';
+          $(document).ready(function() {
+            $selected = false;
+            var $cart = $('#selected-seats'), //Sitting Area
+            $counter = $('#counter'), //Cubic No.
+            $total = $('#total'); //Total money
+            $email=false;
+            $eid= false;
+            $main = false;
+  
+            
+            var sc = $('#seat-map').seatCharts({
+              map: [  //Seating chart
+                'a a',
+                'aa',
+                'aa',
+                'aa',
+                'aa',
+                'aa',
+                'aa',
+              ],					
+              naming : {
+                top : false,
+                getLabel : function (character, row, column) {
+                  return column;
+                }
+              },
+              legend : { //Definition legend
+                node : $('#legend'),
+                items : [
+                  [ 'a', 'available',   'Available' ],
+                  [ 'a', 'unavailable', 'Occupied'],
+                  [ 'a', 'selected', 'Selected']
+                ]					
+              },
+              click: function () { //Click event
+                if (this.status() == 'available' && $selected==false) { //optional seat
+                  $selected = true;
+  
+                  $("#selected-seats").html("BGL5-7-"+(this.settings.row+1)+' / '+this.settings.label);
+    
+                   return 'selected';
+                } else if (this.status() == 'selected' && $selected==true  ) { //Checked
+                    $selected = false;
+                    $("#selected-seats").html("None")
+                    //Update Number
+                    $counter.text(sc.find('selected').length-1);
+                    //Delete reservation
+                    $('#cart-item-'+this.settings.id).remove();
+                    //optional
+                    return 'available';
+                } else if (this.status() == 'unavailable') { //sold
+                  return 'unavailable';
+                } else {
+                  return this.style();
+                }
+              }
+            });
+            
+            //occupiced seat
+            sc.get(['1_2', '4_1','4_2','2_2','6_2']).status('unavailable');
+  
+            function validate(v,re) {
+              return re.test(v);
+            }
+  
+            //Checking Email
+            $("#email").blur(function(e){
+              $pattern = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+              str =$(this).val();	
+              validate($(this).val(),$pattern)?
+                
+                str.substring(str.length-8, str.length).toLowerCase().localeCompare("dell.com") ==0 ? $email=true : $email=false :$email=false
+  
+            });	
+            //Checking EID
+            $("#eid").blur(function(e){
+              $pattern =  /^[0-9]{1,7}$/;
+              str =$(this).val();	
+              
+              validate($(this).val(),$pattern) &&  (str.length >= 6 && str.length < 8)  ? $eid=true : $eid=false
+              console.log($eid);	
+            });	
+            
+            //Function to check both values are correct or not
+            function checkBoth(){
+              $main = false;
+              if($email){
+                if($eid){
+                  $main = true;		
+                }
+                else 
+                  alert("Please enter valid Dell Batch ID");	
+              } else 
+                alert("Please enter valid Dell Email ID");
+            }
+  
+  
+            //CheckOut	
+            $("#bookBtn").click(function(e){
+              checkBoth();
+              if($main){
+                alert("Processing...");
+              }		
+            });
+            //Checking Status	
+            $("#checkoutBtn").click(function(e){
+              checkBoth();
+              if($main){
+                alert("Processing...");
+              }		
+            });
+  
+          });
+         
+        </script>
+    </div>
+  
+  </div>
+  <script src="assets/js/jquery.nicescroll.js"></script>
+  <script src="assets/js/scripts.js"></script>
+  </body>
+</html>
